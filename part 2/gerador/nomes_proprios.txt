@@ -104,7 +104,7 @@ Gael
 Théo
 Heitor
 Ravi
-Davi
+David
 Bernardo
 Noah
 Gabriel
@@ -142,7 +142,7 @@ João Lucas
 Emanuel
 João
 Caleb
-Davi Lucca
+David Lucca
 Antônio
 Eduardo
 Enrico
@@ -165,7 +165,7 @@ Oliver
 Otávio
 João Gabriel
 Nathan
-Davi Lucas
+David Lucas
 Vinícius
 Teodoro
 Valentim
@@ -193,10 +193,10 @@ Kauê
 Kalel
 Luiz Henrique
 Dom
-Davi Miguel
+David Miguel
 Estevão
 Breno
-Davi Luiz
+David Luiz
 Thales
 Israel
 Joana Maria
@@ -209,3 +209,4 @@ Ricardo
 Luís
 Filipe
 Manuel
+Tiago
