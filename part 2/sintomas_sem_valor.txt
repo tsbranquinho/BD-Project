@@ -1,0 +1,61 @@
+Dor de cabeça
+Náusea
+Fadiga
+Tontura
+Febre
+Calafrios
+Suor excessivo
+Dor abdominal
+Dor torácica
+Palpitações
+Falta de ar
+Tosse
+Congestão nasal
+Dor de garganta
+Rouquidão
+Coceira
+Vermelhidão
+Erupção cutânea
+Inchaço
+Dor nas articulações
+Dor muscular
+Cãibras
+Dormência
+Formigamento
+Perda de apetite
+Perda de peso
+Ganho de peso
+Insônia
+Sonolência
+Ansiedade
+Depressão
+Irritabilidade
+Confusão mental
+Visão turva
+Zumbido nos ouvidos
+Alteração do paladar
+Boca seca
+Dificuldade para engolir
+Urgência urinária
+Dor ao urinar
+Constipação
+Diarreia
+Sangramento nasal
+Hematomas
+Falta de coordenação
+Tremores
+Espasmos
+Desmaio
+Sensação de frio
+Olhos secos
+Parestesia
+Fotofobia
+Diplopia
+Disfagia
+Anosmia
+Ageusia
+Bruxismo
+Ptose
+Acatisia
+Hirsutismo
+Morte
