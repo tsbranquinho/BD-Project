@@ -1424,7 +1424,6 @@ Rua das Macieiras
 Rua das Madressilvas
 Rua das Madressilvas
 Rua de Madrid
-Rua Mãe D`água
 Rua das Magnólias
 Rua Mahatma Gandhi
 Rua de Malange
@@ -3133,7 +3132,6 @@ Rua das Clementinas
 Rua Nuno Gonçalves (1425-1491) Pintor
 Rua Alto da Rolas
 Rua da Pedregueira
-Rua da Pedra D'Água
 Rua Lugar das Bóias
 Rua de Cantábria
 Rua Branca Edmée Marques (1899-1986) Primeira Catedrática Química em Portugal

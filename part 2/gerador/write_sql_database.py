@@ -280,6 +280,7 @@ class Popula:
         print("Enfermeiros criados")
         
     def cria_medicos(self):
+        #vamos criar também a versao paciente deles
         for _ in range(20):
             nome = self.cria_nome()
             nif = self.cria_nif()
@@ -288,6 +289,10 @@ class Popula:
             especialidade = "clínica geral"
             medico = Medico(nome, nif, telefone, self.localidades[num_localidade], self.codigos[num_localidade], especialidade)
             self.database["medicos"].append(medico)
+            ssn = self.cria_ssn()
+            data_nascimento = str(random.randint(1924, 2020)) + "-" + (mes := str(random.randint(1, 12)).zfill(2)) + "-" + str(random.randint(1,dias_meses[int(mes)-1])).zfill(2)
+            paciente = Paciente(nome, nif, ssn, telefone, self.codigos[num_localidade], self.localidades[num_localidade], data_nascimento)
+            self.database["pacientes"].append(paciente)
         for _ in range(40):
             nome = self.cria_nome()
             nif = self.cria_nif()
@@ -296,6 +301,10 @@ class Popula:
             especialidade = random.choice(["pediatria", "ortopedia", "cardiologia", "urologia", "neurologia"])
             medico = Medico(nome, nif, telefone, self.localidades[num_localidade], self.codigos[num_localidade], especialidade)
             self.database["medicos"].append(medico)
+            data_nascimento = str(random.randint(1924, 2020)) + "-" + (mes := str(random.randint(1, 12)).zfill(2)) + "-" + str(random.randint(1,dias_meses[int(mes)-1])).zfill(2)
+            ssn = self.cria_ssn()
+            paciente = Paciente(nome, nif, ssn, telefone, self.codigos[num_localidade], self.localidades[num_localidade], data_nascimento)
+            self.database["pacientes"].append(paciente)
         print("Medicos criados")
     
     def coloca_medicos_nas_clinicas(self):
@@ -348,14 +357,26 @@ class Popula:
             medico.criar_registo()
         for paciente in self.database["pacientes"]:
             #garantir 1 consulta por paciente
-            medico = random.choice(self.database["medicos"])
+            medico_is = False
+            if self.is_medico(paciente.nif):
+                #impedir que o medico seja o mesmo que o paciente
+                medico_is = True
+                while (medico:=random.choice(self.database["medicos"])).nif == paciente.nif:
+                    continue
+            else:
+                medico = random.choice(self.database["medicos"])
             nome_clinica = random.choice(list(medico.trabalho.keys()))
             for clinica in self.database["clinicas"]:
                 if clinica.nome == nome_clinica:
                     dias_possiveis = medico.trabalho[nome_clinica]
                     break 
-            while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis:
-                continue
+            if not medico_is:
+                while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis:
+                    continue
+            else:
+                medico_paciente = self.encontra_medico(paciente.nif)
+                while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis and (medico_paciente.disponibilidade[dia_semana(data)] == 1):
+                    continue
             while medico.registos[data][(hora := random.choice(list(medico.registos[data].keys())))] != None:
                 continue
             ssn = paciente.ssn
@@ -403,7 +424,7 @@ class Popula:
                                     continue
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
-                                if data not in paciente.registo.keys():
+                                if data not in paciente.registo.keys() and not self.is_medico(paciente.nif):
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -440,7 +461,7 @@ class Popula:
                                     break
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
-                                if data not in paciente.registo.keys():
+                                if data not in paciente.registo.keys() and not self.is_medico(paciente.nif):
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -516,9 +537,6 @@ class Popula:
                 consulta.regista_sintomas(sintomas)
                 sintomas_c_v.append(sintoma)
         print("Registo de consultas criado")
-            
-
-
 
 
     def testa_medicos_clinicas(self):
@@ -573,6 +591,12 @@ class Popula:
             if medico.nif == nif:
                 return medico
         return None
+    
+    def is_medico(self, nif):
+        for medico in self.database["medicos"]:
+            if medico.nif == nif:
+                return True
+        return False
         
     @staticmethod
     def cria_nif():
