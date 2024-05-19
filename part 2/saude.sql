@@ -44,3 +44,29 @@ CREATE TABLE paciente(
     morada VARCHAR(255) NOT NULL,
     data_nasc DATE NOT NULL
 );
+
+CREATE TABLE consulta(
+    id SERIAL PRIMARY KEY,
+    ssn CHAR(11) NOT NULL REFERENCES paciente,
+    nif CHAR(9) NOT NULL REFERENCES medico,
+    nome VARCHAR(80) NOT NULL REFERENCES clinica,
+    data DATE NOT NULL,
+    hora TIME NOT NULL,
+    codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
+    UNIQUE(ssn, data, hora),
+    UNIQUE(nif, data, hora)
+);
+
+CREATE TABLE receita(
+    codigo_sns VARCHAR(12) NOT NULL REFERENCES consulta (codigo_sns),
+    medicamento VARCHAR(155) NOT NULL,
+    quantidade SMALLINT NOT NULL CHECK (quantidade > 0),
+    PRIMARY KEY (codigo_sns, medicamento)
+);
+
+CREATE TABLE observacao(
+    id INTEGER NOT NULL REFERENCES consulta,
+    parametro VARCHAR(155) NOT NULL,
+    valor FLOAT,
+    PRIMARY KEY (id, parametro)
+)

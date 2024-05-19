@@ -367,7 +367,6 @@ class Popula:
             medico.consultas_diarias[data] += 1
             paciente.registo[data] = consulta
             self.database["consultas"].append(consulta)
-            break
         for ano in range(2023, 2025):
             if ano == 2023:
                 to_use = dias_meses
@@ -402,9 +401,10 @@ class Popula:
                                 if hora == None:
                                     medicos_on_call.remove(medico)
                                     continue
-                            paciente = random.choice(self.database["pacientes"])
-                            if data in paciente.registo.keys():
-                                continue
+                            while True:
+                                paciente = random.choice(self.database["pacientes"])
+                                if data not in paciente.registo.keys():
+                                    break
                             ssn = paciente.ssn
                             nif = medico.nif
                             codigo_sns = self.cria_codigo_sns()
@@ -438,8 +438,10 @@ class Popula:
                                             clinica = clinica_aux
                                             break
                                     break
-                            while data not in (paciente:=random.choice(self.database["pacientes"])).registo.keys():
-                                continue
+                            while True:
+                                paciente = random.choice(self.database["pacientes"])
+                                if data not in paciente.registo.keys():
+                                    break
                             ssn = paciente.ssn
                             nif = medico.nif
                             codigo_sns = self.cria_codigo_sns()
@@ -485,25 +487,34 @@ class Popula:
             sintomas_com_valor.append((sintoma, valor_min, valor_max))
         for consulta in self.database["consultas"]:
             num_medicamentos = random.randint(1, 6)
+            sintomas_s_v = []
+            sintomas_c_v = []
+            medicamentos = []
             for _ in range(num_medicamentos):
-                medicamento = random.choice(medicamentos_totais)
+                while (medicamento:=random.choice(medicamentos_totais)) in medicamentos:
+                    continue
                 quantidade = random.randint(1, 3)
                 receita = Receita(consulta.codigo_sns, medicamento, quantidade)
                 consulta.add_receita(receita)
+                medicamentos.append(medicamento)
             num_sintomas_sem_valor = random.randint(1, 5)
             num_sintomas_com_valor = random.randint(0, 3)
             for _ in range(num_sintomas_sem_valor):
-                sintoma = random.choice(sintomas_sem_valor)
+                while (sintoma:=random.choice(sintomas_sem_valor)) in sintomas_s_v:
+                    continue
                 sintomas = Sintomas(consulta.id)
                 sintomas.add_parametro(sintoma)
                 consulta.regista_sintomas(sintomas)
+                sintomas_s_v.append(sintoma)
             for _ in range(num_sintomas_com_valor):
-                sintoma = random.choice(sintomas_com_valor)
+                while (sintoma:=random.choice(sintomas_com_valor)) in sintomas_c_v:
+                    continue
                 valor = random.uniform(sintoma[1], sintoma[2])
                 sintomas = Sintomas(consulta.id)
                 sintomas.add_parametro(sintoma[0])
                 sintomas.add_valor(valor)
                 consulta.regista_sintomas(sintomas)
+                sintomas_c_v.append(sintoma)
         print("Registo de consultas criado")
             
 
@@ -686,10 +697,10 @@ def converte_para_sql(final, new_file):
                 if medico_num != len(final.database["medicos"]) - 1 or clinica_num != len(list(medico.trabalho.keys())) - 1 or dia_num != len(medico.trabalho[clinica]) - 1:
                     new_file.write(",")
     new_file.write(";\n\n")
-    new_file.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES")
+    new_file.write("INSERT INTO consulta (id, ssn, nif, nome, data, hora, codigo_sns) VALUES")
     for consulta_num in range(len(final.database["consultas"])):
         consulta = final.database["consultas"][consulta_num]
-        new_file.write("\n('" + consulta.ssn_paciente + "', '" + consulta.nif_medico + "', '" + consulta.nome_clinica + "', '" + consulta.data + "', '" + consulta.hora + "', '" + consulta.codigo_sns + "')")
+        new_file.write("\n(" + str(consulta.id) + ", '" + consulta.ssn_paciente + "', '" + consulta.nif_medico + "', '" + consulta.nome_clinica + "', '" + consulta.data + "', '" + consulta.hora + "', '" + consulta.codigo_sns + "')")
         if consulta_num != len(final.database["consultas"]) - 1:
             new_file.write(",")
     new_file.write(";\n\n")
@@ -720,7 +731,7 @@ def converte_para_sql(final, new_file):
 def main():
     file = open_file()
     global ruas
-    with open("ruas.in", "r") as file:
+    with open("ruas.txt", "r") as file:
         for line in file:
             ruas.append(line.strip())
     database = {
@@ -731,10 +742,6 @@ def main():
         "consultas" : []
     }
     final = Popula(database)
-    #final.print_clinicas(database)
-    #final.print_enfermeiros(database)
-    #final.testa_medicos_clinicas()
-    #final.print_pacientes(database)
     new_file = open("data.sql", "w")
     converte_para_sql(final, new_file)
 
