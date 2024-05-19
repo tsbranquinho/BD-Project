@@ -2,9 +2,9 @@
 ALTER TABLE consulta
 ADD CONSTRAINT check_hora
 CHECK (
-  EXTRACT(MINUTE FROM hora) IN (0, 30) AND 
+  EXTRACT(MINUTE FROM hora) IN (0, 30) AND
   (
-    (EXTRACT(HOUR FROM hora) BETWEEN 8 AND 12) OR 
+    (EXTRACT(HOUR FROM hora) BETWEEN 8 AND 12) OR
     (EXTRACT(HOUR FROM hora) BETWEEN 14 AND 19)
   )
   OR RAISE EXCEPTION 'Os horários das consultas devem ser em horas exatas ou meia hora, entre 8h e 12h e entre 14h e 19h.'
@@ -34,8 +34,8 @@ BEGIN
     FROM trabalha 
     WHERE nif = NEW.nif AND nome = NEW.nome AND dia_da_semana = EXTRACT(DOW FROM NEW.data)
   ) THEN
-    RAISE EXCEPTION 'Um doutor só pode dar consultas na clinica nos dias em que trabalha.'; --esta frase é um bocado confusa
-  END IF;
+    RAISE EXCEPTION 'Um medico só pode dar consultas na clinica nos dias em que trabalha.';
+  END IF; 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
