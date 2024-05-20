@@ -30,8 +30,6 @@ def dia_semana(data):
     
     return dia_semana
 
-print(dia_semana("2023-01-01"))
-
 class Morada:
     def __init__(self, codigo, localidade):
         self.codigo = codigo
@@ -738,7 +736,7 @@ def converte_para_sql(final, new_file):
         for receita_num in range(len(consulta.receita)):
             receita = consulta.receita[receita_num]
             new_file.write("\n('" + consulta.codigo_sns + "', '" + receita.medicamento + "', " + str(receita.quantidade) + ")")
-            if consulta_num != len(final.database["consultas"]) - 1 or receita_num != len(consulta.receita) - 1:
+            if (consulta_num != len(final.database["consultas"]) - 1 or receita_num != len(consulta.receita) - 1) and not (consulta_num+1 == range(len(final.database["consultas"])-1 and len(final.database["consultas"][consulta_num+1].receita) == 0)):
                 new_file.write(",")
     new_file.write(";\n\n")
     new_file.write("INSERT INTO observacao (id, parametro, valor) VALUES")

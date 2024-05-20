@@ -1,25 +1,25 @@
-Pressão arterial, 50, 150
-Frequência cardíaca, 50, 150
-Temperatura corporal, 33, 41
-Nível de glicose no sangue, 30, 120
-Saturação de oxigênio, 85, 100
-Índice de massa corporal (IMC), 16, 33
-Nível de colesterol, 0, 400
-Nível de triglicerídeos, 0, 300
-Contagem de hemoglobina, 10, 20
-Contagem de leucócitos, 2000, 15000
-Contagem de plaquetas, 100000, 600000
-Volume urinário, 500, 4000
-Nível de creatinina, 0.3, 2.4
-Taxa de filtração glomerular (TFG), 60, 150
-Tempo de protrombina (TP), 6, 16
-Nível de sódio no sangue, 100, 200
-Nível de potássio no sangue, 2, 8
-Nível de cálcio no sangue, 6, 15
-Taxa de sedimentação de eritrócitos (VHS), 0, 40
-Nível de proteína C-reativa (PCR), 0, 10
-Nível de TSH, 0, 6
-Volume de hematócrito, 20, 60
-Nível de ácido úrico, 1, 9
-Nível de bilirrubina, 0, 3
-Nível de albumina, 2, 7
+pressão arterial, 50, 150
+frequência cardíaca, 50, 150
+temperatura corporal, 33, 41
+nível de glicose no sangue, 30, 120
+saturação de oxigênio, 85, 100
+índice de massa corporal (IMC), 16, 33
+nível de colesterol, 0, 400
+nível de triglicerídeos, 0, 300
+contagem de hemoglobina, 10, 20
+contagem de leucócitos, 2000, 15000
+contagem de plaquetas, 100000, 600000
+volume urinário, 500, 4000
+nível de creatinina, 0.3, 2.4
+taxa de filtração glomerular (TFG), 60, 150
+tempo de protrombina (TP), 6, 16
+nível de sódio no sangue, 100, 200
+nível de potássio no sangue, 2, 8
+nível de cálcio no sangue, 6, 15
+taxa de sedimentação de eritrócitos (VHS), 0, 40
+nível de proteína C-reativa (PCR), 0, 10
+nível de TSH, 0, 6
+volume de hematócrito, 20, 60
+nível de ácido úrico, 1, 9
+nível de bilirrubina, 0, 3
+pressão diastólica, 6, 13

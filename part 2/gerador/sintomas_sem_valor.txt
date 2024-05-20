@@ -1,61 +1,61 @@
-Dor de cabeça
-Náusea
-Fadiga
-Tontura
-Febre
-Calafrios
-Suor excessivo
-Dor abdominal
-Dor torácica
-Palpitações
-Falta de ar
-Tosse
-Congestão nasal
-Dor de garganta
-Rouquidão
-Coceira
-Vermelhidão
-Erupção cutânea
-Inchaço
-Dor nas articulações
-Dor muscular
-Cãibras
-Dormência
-Formigamento
-Perda de apetite
-Perda de peso
-Ganho de peso
-Insônia
-Sonolência
-Ansiedade
-Depressão
-Irritabilidade
-Confusão mental
-Visão turva
-Zumbido nos ouvidos
-Alteração do paladar
-Boca seca
-Dificuldade para engolir
-Urgência urinária
-Dor ao urinar
-Constipação
-Diarreia
-Sangramento nasal
-Hematomas
-Falta de coordenação
-Tremores
-Espasmos
-Desmaio
-Sensação de frio
-Olhos secos
-Parestesia
-Fotofobia
-Diplopia
-Disfagia
-Anosmia
-Ageusia
-Bruxismo
-Ptose
-Acatisia
-Hirsutismo
-Morte
+dor de cabeça
+náusea
+fadiga
+tontura
+febre
+calafrios
+suor excessivo
+dor abdominal
+dor torácica
+palpitações
+falta de ar
+tosse
+congestão nasal
+dor de garganta
+rouquidão
+coceira
+vermelhidão
+erupção cutânea
+inchaço
+dor nas articulações
+dor muscular
+cãibras
+dormência
+formigamento
+perda de apetite
+perda de peso
+ganho de peso
+insônia
+sonolência
+ansiedade
+depressão
+irritabilidade
+confusão mental
+visão turva
+zumbido nos ouvidos
+alteração do paladar
+boca seca
+dificuldade para engolir
+urgência urinária
+dor ao urinar
+constipação
+diarreia
+sangramento nasal
+hematomas
+falta de coordenação
+tremores
+espasmos
+desmaio
+sensação de frio
+olhos secos
+parestesia
+fotofobia
+diplopia
+disfagia
+anosmia
+ageusia
+bruxismo
+ptose
+acatisia
+hirsutismo
+morte
