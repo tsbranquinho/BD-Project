@@ -275,9 +275,9 @@ class Popula:
                     self.check_clinicas()
         
     def cria_enfermeiros(self):
-        self.nomes_proprios = [line.strip() for line in open("/home/tbranquinho18/BD/Projeto/part 2/gerador/nomes_proprios.txt", "r").readlines()]
+        self.nomes_proprios = [line.strip() for line in open("nomes_proprios.txt", "r").readlines()]
         self.sobrenomes = []
-        for line in open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sobrenomes.txt", "r").readlines():
+        for line in open("sobrenomes.txt", "r").readlines():
             line = line.strip()
             result = re.split(r'[ \t]+', line)
             self.sobrenomes.append(result[0])
@@ -491,9 +491,9 @@ class Popula:
         
 
     def cria_registo_consulta(self):
-        file = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/medicamentos.txt", "r").readlines()
-        file2 = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sintomas_sem_valor.txt").readlines()
-        file3 = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sintomas_com_valor.txt").readlines()
+        file = open("medicamentos.txt", "r").readlines()
+        file2 = open("sintomas_sem_valor.txt").readlines()
+        file3 = open("sintomas_com_valor.txt").readlines()
         medicamentos_totais = []
         sintomas_sem_valor = []
         sintomas_com_valor = []
@@ -684,11 +684,6 @@ class Popula:
             paciente.print()
             print()
             i += 1
-            
-
-def open_file():
-    file = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/aux.txt", "w")
-    return file
 
 def converte_para_sql(final, new_file):
     new_file.write("INSERT INTO clinica (nome, telefone, morada) VALUES")
@@ -763,7 +758,7 @@ def converte_para_sql(final, new_file):
 
 def main():
     global ruas
-    with open("/home/tbranquinho18/BD/Projeto/part 2/gerador/ruas.txt", "r") as file:
+    with open("ruas.txt", "r") as file:
         for line in file:
             ruas.append(line.strip())
     database = {
@@ -775,7 +770,7 @@ def main():
     }
     final = Popula(database)
     final.testa_consultas()
-    new_file = open("/home/tbranquinho18/BD/Projeto/part 2/data.sql", "w")
+    new_file = open("../data.sql", "w")
     converte_para_sql(final, new_file)
 
 
