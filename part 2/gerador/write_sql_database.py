@@ -12,15 +12,25 @@ codigo_sns_usados = []
 ruas = []
 
 def dia_semana(data):
-    data = data.split("-")
-    ano = int(data[0])
-    mes = int(data[1])
-    dia = int(data[2])
+    # Separando a data em ano, mês e dia
+    ano, mes, dia = map(int, data.split("-"))
+
+    # Ajuste para janeiro e fevereiro
     if mes < 3:
         mes += 12
         ano -= 1
-    dia_semana = (dia + 2*mes + 3*(mes+1)//5 + ano + ano//4 - ano//100 + ano//400) % 7
+
+    # Algoritmo de Zeller para calcular o dia da semana
+    K = ano % 100
+    J = ano // 100
+    dia_semana = (dia + 13*(mes+1)//5 + K + K//4 + J//4 - 2*J) % 7
+
+    # Ajustando o resultado para considerar domingo como 0
+    dia_semana = (dia_semana + 6) % 7
+    
     return dia_semana
+
+print(dia_semana("2023-01-01"))
 
 class Morada:
     def __init__(self, codigo, localidade):
@@ -38,7 +48,7 @@ class Clinica:
         self.nome = nome
         self.telefone = telefone
         self.enfermeiros = []
-        self.medicos = {}
+        self.medicos = [[] for _ in range(7)]
         self.morada = Morada(codigo, localidade)
         self.num_medicos = [0 for _ in range(7)]
 
@@ -99,10 +109,7 @@ class Medico:
     def trabalha_na_clinica(self, clinica, dia_semana):
         if self.disponibilidade[dia_semana] == 1:
             return False
-        if self.nif in clinica.medicos:
-            clinica.medicos[self.nif].append(dia_semana)
-        else:
-            clinica.medicos[self.nif] = [dia_semana]
+        clinica.medicos[dia_semana].append(self.nif)
         if clinica.nome in self.trabalho:
             self.trabalho[clinica.nome].append(dia_semana)
         else:
@@ -230,11 +237,16 @@ class Popula:
 
     def cria_clinicas(self):
         self.localidades = ["Lisboa", "Amadora", "Sintra", "Oeiras", "Cascais", "Loures", "Odivelas", "Torres Vedras", "Vila Franca de Xira", "Mafra"]
+        localidades_usadas = []
         self.codigos = ["1050", "2610", "2710", "2780", "2750", "2670", "2620", "2560", "2600", "2601", "2640"]
         nomes = ["Clínica Pública", "Clínica Privada", "Clínica Feliz", "Clínica do Povo", "Clínica Luís de Camões", "Clínica Especializada", "Clínica Velha", "Clínica Nova", "Clínica do Mar", "Clínica do Campo"]
         for _ in range(5):
             nome = random.choice(nomes)
-            num_localidade = random.randint(0, len(self.localidades) - 1)
+            if len(localidades_usadas) < 3:
+                while (num_localidade := random.randint(0, len(self.localidades) - 1)) in localidades_usadas:
+                    continue
+            else:
+                num_localidade = random.randint(0, len(self.localidades) - 1)
             localidade = self.localidades[num_localidade]
             codigo = self.codigos[num_localidade]
             nome += " de " + localidade
@@ -243,6 +255,7 @@ class Popula:
                 telefone += str(random.randint(0, 9))
             clinica = Clinica(nome, telefone, localidade, codigo)
             self.database["clinicas"].append(clinica)
+            localidades_usadas.append(num_localidade)
         self.check_clinicas()
         print("Clinicas criadas")
 
@@ -262,9 +275,9 @@ class Popula:
                     self.check_clinicas()
         
     def cria_enfermeiros(self):
-        self.nomes_proprios = [line.strip() for line in open("nomes_proprios.txt", "r").readlines()]
+        self.nomes_proprios = [line.strip() for line in open("/home/tbranquinho18/BD/Projeto/part 2/gerador/nomes_proprios.txt", "r").readlines()]
         self.sobrenomes = []
-        for line in open("sobrenomes.txt", "r").readlines():
+        for line in open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sobrenomes.txt", "r").readlines():
             line = line.strip()
             result = re.split(r'[ \t]+', line)
             self.sobrenomes.append(result[0])
@@ -289,10 +302,6 @@ class Popula:
             especialidade = "clínica geral"
             medico = Medico(nome, nif, telefone, self.localidades[num_localidade], self.codigos[num_localidade], especialidade)
             self.database["medicos"].append(medico)
-            ssn = self.cria_ssn()
-            data_nascimento = str(random.randint(1924, 2020)) + "-" + (mes := str(random.randint(1, 12)).zfill(2)) + "-" + str(random.randint(1,dias_meses[int(mes)-1])).zfill(2)
-            paciente = Paciente(nome, nif, ssn, telefone, self.codigos[num_localidade], self.localidades[num_localidade], data_nascimento)
-            self.database["pacientes"].append(paciente)
         for _ in range(40):
             nome = self.cria_nome()
             nif = self.cria_nif()
@@ -301,10 +310,6 @@ class Popula:
             especialidade = random.choice(["pediatria", "ortopedia", "cardiologia", "urologia", "neurologia"])
             medico = Medico(nome, nif, telefone, self.localidades[num_localidade], self.codigos[num_localidade], especialidade)
             self.database["medicos"].append(medico)
-            data_nascimento = str(random.randint(1924, 2020)) + "-" + (mes := str(random.randint(1, 12)).zfill(2)) + "-" + str(random.randint(1,dias_meses[int(mes)-1])).zfill(2)
-            ssn = self.cria_ssn()
-            paciente = Paciente(nome, nif, ssn, telefone, self.codigos[num_localidade], self.localidades[num_localidade], data_nascimento)
-            self.database["pacientes"].append(paciente)
         print("Medicos criados")
     
     def coloca_medicos_nas_clinicas(self):
@@ -317,7 +322,7 @@ class Popula:
                 last_clinica = clinica
                 while medico.disponibilidade[(dia:=random.randint(0, 6))] == 1:
                     continue
-                if medico.nif not in clinica.medicos.keys():
+                if medico.nif not in clinica.medicos[dia]:
                     medico.trabalha_na_clinica(clinica, dia)
                     clinica.num_medicos[dia] += 1
                     medico.num_clinicas += 1
@@ -357,26 +362,14 @@ class Popula:
             medico.criar_registo()
         for paciente in self.database["pacientes"]:
             #garantir 1 consulta por paciente
-            medico_is = False
-            if self.is_medico(paciente.nif):
-                #impedir que o medico seja o mesmo que o paciente
-                medico_is = True
-                while (medico:=random.choice(self.database["medicos"])).nif == paciente.nif:
-                    continue
-            else:
-                medico = random.choice(self.database["medicos"])
+            medico = random.choice(self.database["medicos"])
             nome_clinica = random.choice(list(medico.trabalho.keys()))
             for clinica in self.database["clinicas"]:
                 if clinica.nome == nome_clinica:
                     dias_possiveis = medico.trabalho[nome_clinica]
                     break 
-            if not medico_is:
-                while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis:
-                    continue
-            else:
-                medico_paciente = self.encontra_medico(paciente.nif)
-                while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis and (medico_paciente.disponibilidade[dia_semana(data)] == 1):
-                    continue
+            while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis:
+                continue
             while medico.registos[data][(hora := random.choice(list(medico.registos[data].keys())))] != None:
                 continue
             ssn = paciente.ssn
@@ -396,13 +389,12 @@ class Popula:
             for mes in range(12):
                 for dia in range(to_use[mes]):
                     data = str(ano) + "-" + str(mes+1).zfill(2) + "-" + str(dia+1).zfill(2)
-                    medicos_on_call = []
                     dia_week = dia_semana(data)
                     for clinica in self.database["clinicas"]:
-                        for medico_nif in clinica.medicos.keys():
-                            if dia_week in clinica.medicos[medico_nif]:
-                                medico = self.encontra_medico(medico_nif)
-                                medicos_on_call.append(medico)
+                        medicos_on_call = []
+                        for medico_nif in clinica.medicos[dia_week]:
+                            medico = self.encontra_medico(medico_nif)
+                            medicos_on_call.append(medico)
                         while clinica.registo[data] < 20:
                             medico = random.choice(medicos_on_call)
                             hora = None
@@ -424,7 +416,7 @@ class Popula:
                                     continue
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
-                                if data not in paciente.registo.keys() and not self.is_medico(paciente.nif):
+                                if data not in paciente.registo.keys():
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -440,10 +432,6 @@ class Popula:
                             continue
                         while medico.consultas_diarias[data] < 2:
                             hora = None
-                            for horas in medico.registos[data].keys():
-                                if medico.registos[data][horas] == None:
-                                    hora = horas
-                                    break
                             for _ in range(20):
                                 horas = random.choice(list(medico.registos[data].keys()))
                                 if medico.registos[data][horas] == None:
@@ -461,7 +449,7 @@ class Popula:
                                     break
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
-                                if data not in paciente.registo.keys() and not self.is_medico(paciente.nif):
+                                if data not in paciente.registo.keys():
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -472,7 +460,6 @@ class Popula:
                             medico.consultas_diarias[data] += 1
                             paciente.registo[data] = consulta
                             self.database["consultas"].append(consulta)
-                        
                 print("Mes {} de {}".format(mes+1, ano))
         print("Consultas criadas")
         self.ordena_consultas()                
@@ -488,13 +475,29 @@ class Popula:
             consulta.id = id
             id += 1
 
+    def testa_consultas(self):
+        for consulta in self.database["consultas"]:
+            nif = consulta.nif_medico
+            medico = self.encontra_medico(nif)
+            nome_clinica = consulta.nome_clinica
+            for clinica in self.database["clinicas"]:
+                if clinica.nome == nome_clinica:
+                    break
+            try:
+                if dia_semana(consulta.data) not in medico.trabalho[nome_clinica]:
+                    print("Medico", medico.nome, "não trabalha na clinica", nome_clinica, "no dia", consulta.data)
+            except:
+                print("Medico", medico.nome, "não trabalha na clinica", nome_clinica, "no dia", consulta.data)
+        
+
     def cria_registo_consulta(self):
-        file = open("medicamentos.txt", "r").readlines()
-        file2 = open("sintomas_sem_valor.txt").readlines()
-        file3 = open("sintomas_com_valor.txt").readlines()
+        file = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/medicamentos.txt", "r").readlines()
+        file2 = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sintomas_sem_valor.txt").readlines()
+        file3 = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/sintomas_com_valor.txt").readlines()
         medicamentos_totais = []
         sintomas_sem_valor = []
         sintomas_com_valor = []
+        counter = 0
         for line in file:
             medicamentos_totais.append(line.strip())
         for line in file2:
@@ -507,7 +510,13 @@ class Popula:
             valor_max = float(result[2])
             sintomas_com_valor.append((sintoma, valor_min, valor_max))
         for consulta in self.database["consultas"]:
-            num_medicamentos = random.randint(1, 6)
+            if counter == 4:
+                num_medicamentos = 0
+                counter = 0
+            else:
+                num_medicamentos = random.randint(1, 6)
+                medicamentos = []
+                counter += 1
             sintomas_s_v = []
             sintomas_c_v = []
             medicamentos = []
@@ -678,7 +687,7 @@ class Popula:
             
 
 def open_file():
-    file = open("data.txt", "w")
+    file = open("/home/tbranquinho18/BD/Projeto/part 2/gerador/aux.txt", "w")
     return file
 
 def converte_para_sql(final, new_file):
@@ -753,9 +762,8 @@ def converte_para_sql(final, new_file):
     new_file.close()
 
 def main():
-    file = open_file()
     global ruas
-    with open("ruas.txt", "r") as file:
+    with open("/home/tbranquinho18/BD/Projeto/part 2/gerador/ruas.txt", "r") as file:
         for line in file:
             ruas.append(line.strip())
     database = {
@@ -766,7 +774,8 @@ def main():
         "consultas" : []
     }
     final = Popula(database)
-    new_file = open("data.sql", "w")
+    final.testa_consultas()
+    new_file = open("/home/tbranquinho18/BD/Projeto/part 2/data.sql", "w")
     converte_para_sql(final, new_file)
 
 

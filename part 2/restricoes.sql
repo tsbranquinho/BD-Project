@@ -5,10 +5,10 @@ BEGIN
     EXTRACT(MINUTE FROM NEW.hora) IN (0, 30) AND 
     (
       (EXTRACT(HOUR FROM NEW.hora) BETWEEN 8 AND 12) OR 
-      (EXTRACT(HOUR FROM NEW.hora) BETWEEN 14 AND 19)
+      (EXTRACT(HOUR FROM NEW.hora) BETWEEN 14 AND 18)
     )
   ) THEN
-    RAISE EXCEPTION 'Os horários das consultas devem ser em horas exatas ou meia hora, entre 8h e 12h e entre 14h e 19h.';
+    RAISE EXCEPTION 'Os horários das consultas devem ser em horas exatas ou meia hora, entre 8h e 13h e entre 14h e 19h.';
   END IF;
   RETURN NEW;
 END;
