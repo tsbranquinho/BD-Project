@@ -386,35 +386,44 @@ class Popula:
                 to_use = dias_meses_2024
             for mes in range(12):
                 for dia in range(to_use[mes]):
+                    #garantir 20 consultas por clinica por dia e 2 consultas por medico por dia
                     data = str(ano) + "-" + str(mes+1).zfill(2) + "-" + str(dia+1).zfill(2)
                     dia_week = dia_semana(data)
                     for clinica in self.database["clinicas"]:
+                        #20 por dia
                         medicos_on_call = []
                         for medico_nif in clinica.medicos[dia_week]:
+                            #médicos a trabalhar nesse dia
                             medico = self.encontra_medico(medico_nif)
                             medicos_on_call.append(medico)
                         while clinica.registo[data] < 20:
+                            #enquanto não houver 20 consultas
                             medico = random.choice(medicos_on_call)
                             hora = None
                             if medico.consultas_diarias[data] == 18:
+                                #já não tem vagas nesse dia
                                 medicos_on_call.remove(medico)
                                 continue
                             for _ in range(30):
+                                #30 tentativas de encontrar uma hora livre
                                 horas = random.choice(list(medico.registos[data].keys()))
                                 if medico.registos[data][horas] == None:
                                     hora = horas
                                     break
                             if hora == None:
+                                #não encontrou hora livre por sorte, logo bruteforce
                                 for horas in medico.registos[data].keys():
                                     if medico.registos[data][horas] == None:
                                         hora = horas
                                         break
                                 if hora == None:
+                                    #não há vagas nesse dia
                                     medicos_on_call.remove(medico)
                                     continue
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
                                 if data not in paciente.registo.keys():
+                                    #paciente sem consulta nesse dia (fiz uma consulta por paciente por dia)
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -426,9 +435,12 @@ class Popula:
                             paciente.registo[data] = consulta
                             self.database["consultas"].append(consulta)
                     for medico in self.database["medicos"]:
+                        #2 por dia
                         if medico.disponibilidade[(dia_week := dia_semana(data))] == 0 or medico.consultas_diarias[data] >= 2:
+                            #não trabalha nesse dia ou já tem 2 consultas
                             continue
                         while medico.consultas_diarias[data] < 2:
+                            #enquanto não tiver 2 consultas
                             hora = None
                             for _ in range(20):
                                 horas = random.choice(list(medico.registos[data].keys()))
@@ -436,18 +448,21 @@ class Popula:
                                     hora = horas
                                     break
                             if hora == None:
+                                #não encontrou hora livre por sorte, logo assumimos não haver vagas (podia ter feito diferente)
                                 break
                             clinica = None
                             for nome_clinica in medico.trabalho.keys():
                                 if dia_week in medico.trabalho[nome_clinica]:
                                     for clinica_aux in self.database["clinicas"]:
                                         if clinica_aux.nome == nome_clinica:
+                                            #encontrou a clinica onde trabalha nesse dia
                                             clinica = clinica_aux
                                             break
                                     break
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
                                 if data not in paciente.registo.keys():
+                                    #paciente sem consulta nesse dia (fiz uma consulta por paciente por dia)
                                     break
                             ssn = paciente.ssn
                             nif = medico.nif
@@ -508,6 +523,9 @@ class Popula:
             valor_max = float(result[2])
             sintomas_com_valor.append((sintoma, valor_min, valor_max))
         for consulta in self.database["consultas"]:
+            if consulta.data == "2024-06-03":
+                print("Final das receitas")
+                break
             if counter == 4:
                 num_medicamentos = 0
                 counter = 0
