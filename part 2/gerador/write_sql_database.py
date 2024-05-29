@@ -311,6 +311,16 @@ class Popula:
         print("Medicos criados")
     
     def coloca_medicos_nas_clinicas(self):
+
+        for clinica in self.database["clinicas"]:
+            for dia_semana in range(7):
+                while clinica.num_medicos[dia_semana] < 8:
+                    medico = random.choice(self.database["medicos"])
+                    if medico.disponibilidade[dia_semana] == 0:
+                        medico.trabalha_na_clinica(clinica, dia_semana)
+                        clinica.num_medicos[dia_semana] += 1
+                        medico.num_clinicas += 1
+
         for medico in self.database["medicos"]:
             last_clinica = None
             while medico.num_clinicas < 2:
@@ -324,17 +334,17 @@ class Popula:
                     medico.trabalha_na_clinica(clinica, dia)
                     clinica.num_medicos[dia] += 1
                     medico.num_clinicas += 1
+            for dia in range(7):
+                if medico.disponibilidade[dia] == 1:
+                    continue
+                while medico.nif in (clinica := random.choice(self.database["clinicas"])).medicos[dia]:
+                    continue
+                medico.trabalha_na_clinica(clinica, dia)
+                clinica.num_medicos[dia] += 1
+                medico.num_clinicas += 1
+        print("Medicos colocados nas clinicas")
+
                 
-        # Ensure each clinic has at least 8 doctors every day
-        for clinica in self.database["clinicas"]:
-            for dia_semana in range(7):
-                while clinica.num_medicos[dia_semana] < 8:
-                    medico = random.choice(self.database["medicos"])
-                    if medico.disponibilidade[dia_semana] == 0:
-                        medico.trabalha_na_clinica(clinica, dia_semana)
-                        clinica.num_medicos[dia_semana] += 1
-                        medico.num_clinicas += 1
-    
     def cria_pacientes(self):
         novas_localidades = ["Setúbal", "Almada", "Barreiro", "Montijo", "Palmela", "Seixal", "Sesimbra", "Santiago do Cacém", "Sines", "Grândola", "Alcácer do Sal", "Carregado", "Proença-a-Nova", "Fátima", "Tábua", "Santa Comba Dão", "Mangualde", "Viseu", "Coimbra", "Porto"]
         novos_codigos = ["2900", "2800", "2830", "2870", "2950", "2840", "2970", "7540", "7520", "7570", "7580", "2580", "6150", "2495", "3420", "3440", "3530", "3500", "3000", "4100"]
@@ -354,6 +364,8 @@ class Popula:
 
     def cria_consultas(self):
         print("A criar consultas")
+        clinicas_dict = {clinica.nome: clinica for clinica in self.database["clinicas"]}
+        medicos_dict = {medico.nif: medico for medico in self.database["medicos"]}
         for clinica in self.database["clinicas"]:
             clinica.cria_registo()
         for medico in self.database["medicos"]:
@@ -362,10 +374,7 @@ class Popula:
             #garantir 1 consulta por paciente
             medico = random.choice(self.database["medicos"])
             nome_clinica = random.choice(list(medico.trabalho.keys()))
-            for clinica in self.database["clinicas"]:
-                if clinica.nome == nome_clinica:
-                    dias_possiveis = medico.trabalho[nome_clinica]
-                    break 
+            dias_possiveis = medico.trabalho[nome_clinica]
             while (dia_semana(data:=random.choice(list(medico.registos.keys())))) not in dias_possiveis:
                 continue
             while medico.registos[data][(hora := random.choice(list(medico.registos[data].keys())))] != None:
@@ -394,7 +403,7 @@ class Popula:
                         medicos_on_call = []
                         for medico_nif in clinica.medicos[dia_week]:
                             #médicos a trabalhar nesse dia
-                            medico = self.encontra_medico(medico_nif)
+                            medico = medicos_dict[medico_nif]
                             medicos_on_call.append(medico)
                         while clinica.registo[data] < 20:
                             #enquanto não houver 20 consultas
@@ -448,17 +457,16 @@ class Popula:
                                     hora = horas
                                     break
                             if hora == None:
-                                #não encontrou hora livre por sorte, logo assumimos não haver vagas (podia ter feito diferente)
-                                break
-                            clinica = None
-                            for nome_clinica in medico.trabalho.keys():
-                                if dia_week in medico.trabalho[nome_clinica]:
-                                    for clinica_aux in self.database["clinicas"]:
-                                        if clinica_aux.nome == nome_clinica:
-                                            #encontrou a clinica onde trabalha nesse dia
-                                            clinica = clinica_aux
-                                            break
+                                for horas in medico.registos[data].keys():
+                                    if medico.registos[data][horas] == None:
+                                        hora = horas
+                                        break
+                                if hora == None:
+                                    #não há vagas nesse dia
                                     break
+                                break
+                            nome_clinica = next((nc for nc in medico.trabalho if dia_week in medico.trabalho[nc]), None)
+                            clinica = clinicas_dict[nome_clinica]
                             while True:
                                 paciente = random.choice(self.database["pacientes"])
                                 if data not in paciente.registo.keys():
@@ -523,7 +531,7 @@ class Popula:
             valor_max = float(result[2])
             sintomas_com_valor.append((sintoma, valor_min, valor_max))
         for consulta in self.database["consultas"]:
-            if consulta.data == "2024-06-03":
+            if consulta.data == "2024-06-01":
                 print("Final das receitas")
                 break
             if counter == 4:
@@ -749,18 +757,16 @@ def converte_para_sql(final, new_file):
             new_file.write(",")
     new_file.write(";\n\n")
     new_file.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES")
-    for consulta_num in range(len(final.database["consultas"])):
-        consulta = final.database["consultas"][consulta_num]
-        for receita_num in range(len(consulta.receita)):
-            receita = consulta.receita[receita_num]
-            new_file.write("\n('" + consulta.codigo_sns + "', '" + receita.medicamento + "', " + str(receita.quantidade) + ")")
-            try:
-                if (consulta_num != len(final.database["consultas"]) - 1 or receita_num != len(consulta.receita) - 1) and not (consulta_num+1 == range(len(final.database["consultas"])-1 and len(final.database["consultas"][consulta_num+1].receita) == 0)):
-                    new_file.write(",")
-            except IndexError:
-                if consulta_num != len(final.database["consultas"]) - 1 or receita_num != len(consulta.receita) - 1:
-                    new_file.write(",")
-    new_file.write(";\n\n")
+
+    valores_receitas = []
+    for consulta in final.database["consultas"]:
+        for receita in consulta.receita:
+            valores_receitas.append(f"('{consulta.codigo_sns}', '{receita.medicamento}', {receita.quantidade})")
+
+    if valores_receitas:
+        new_file.write("\n" + ",\n".join(valores_receitas) + ";\n\n")
+    else:
+        new_file.write(";\n\n")
     new_file.write("INSERT INTO observacao (id, parametro, valor) VALUES")
     for consulta_num in range(len(final.database["consultas"])):
         consulta = final.database["consultas"][consulta_num]
@@ -790,7 +796,7 @@ def main():
     }
     final = Popula(database)
     final.testa_consultas()
-    new_file = open("../data.sql", "w")
+    new_file = open("../Data/data.sql", "w")
     converte_para_sql(final, new_file)
 
 
