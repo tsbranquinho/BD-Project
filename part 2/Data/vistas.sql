@@ -1,3 +1,5 @@
+DROP MATERIALIZED VIEW IF EXISTS historial_paciente;
+
 CREATE MATERIALIZED VIEW historial_paciente AS
 SELECT
     c.id,
@@ -8,7 +10,7 @@ SELECT
     EXTRACT(YEAR FROM c.data) AS ano,
     EXTRACT(MONTH FROM c.data) AS mes,
     EXTRACT(DAY FROM c.data) AS dia_do_mes,
-    substring(cl.morada from ', ([^,]+)$') AS localidade,  -- Assumindo que a localidade é a última parte da morada após uma vírgula
+    substring(cl.morada from ', ([^,]+)$') AS localidade,
     m.especialidade,
     'observacao' AS tipo,
     o.parametro AS chave,
@@ -33,7 +35,7 @@ SELECT
     EXTRACT(YEAR FROM c.data) AS ano,
     EXTRACT(MONTH FROM c.data) AS mes,
     EXTRACT(DAY FROM c.data) AS dia_do_mes,
-    substring(cl.morada from ', ([^,]+)$') AS localidade,  -- Assumindo que a localidade é a última parte da morada após uma vírgula
+    substring(cl.morada from ', ([^,]+)$') AS localidade,
     m.especialidade,
     'receita' AS tipo,
     r.medicamento AS chave,
@@ -45,5 +47,4 @@ JOIN
 JOIN 
     clinica cl ON c.nome = cl.nome
 JOIN 
-    receita r ON c.codigo_sns = r.codigo_sns
-ORDER BY c.id FROM consulta;  -- Sort by the id column
+    receita r ON c.codigo_sns = r.codigo_sns;

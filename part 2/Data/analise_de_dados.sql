@@ -13,26 +13,25 @@ WITH progresso_ortopedico AS (
         AND hp.especialidade = 'ortopedia' 
         AND hp.valor IS NULL
 )
-SELECT ssn, nome_paciente
+
+SELECT nome_paciente, ssn
 FROM progresso_ortopedico
 WHERE data - data_anterior = (SELECT MAX(data - data_anterior) FROM progresso_ortopedico);
 
 --medicamentos cardiologia
-SELECT
-    r.medicamento AS medicamento,
-    COUNT(DISTINCT EXTRACT(MONTH FROM c.data) || '-' || EXTRACT(YEAR FROM c.data)) AS months_prescribed
+SELECT 
+    chave AS medicamento
 FROM 
-    receita r
-JOIN 
-    consulta c ON r.codigo_sns = c.codigo_sns
-JOIN 
-    medico m ON c.nif = m.nif
+    historial_paciente
 WHERE 
-    m.especialidade = 'Cardiologia'
+    especialidade = 'Cardiologia'
+    AND data >= CURRENT_DATE - INTERVAL '1 year'
 GROUP BY 
-    r.medicamento
+    medicamento, ssn
 HAVING 
-    COUNT(DISTINCT EXTRACT(MONTH FROM c.data) || '-' || EXTRACT(YEAR FROM c.data)) >= 12;
+    COUNT(DISTINCT mes || '-' || ano) = 12
+ORDER BY 
+    medicamento;
 
 
 
@@ -41,37 +40,35 @@ SELECT
     chave AS medicamento,
     SUM(valor) AS quantidade_total,
     localidade,
-    nome,
-    EXTRACT(MONTH FROM data) AS mes,
+    hp.nome AS nome_clinica,
+    mes,
     dia_do_mes,
-    especialidade,
-    nif AS nif_medico
-FROM historial_paciente
-WHERE tipo = 'receita' AND EXTRACT(YEAR FROM data) = 2023
-GROUP BY chave, localidade, nome, EXTRACT(MONTH FROM data), dia_do_mes, especialidade, nif_medico;
+    m.nome AS nome_medico,
+    m.especialidade
+FROM 
+    historial_paciente hp
+JOIN
+    medico m USING(nif)
+WHERE 
+    tipo = 'receita' AND ano = 2023
+GROUP BY GROUPING SETS(
+    (chave),
+    (chave, localidade),
+    (chave, localidade, nome_clinica),
+    (chave, mes),
+    (chave, mes, dia_do_mes),
+    (chave, m.especialidade),
+    (chave, m.especialidade, nome_medico))
+ORDER BY chave, localidade, nome_clinica, mes, dia_do_mes, m.especialidade, nome_medico;
 
 
 --enviesamento na medição de algum parâmetros entre clínicas, especialidades médicas ou médicos
 SELECT
-    COALESCE(hp.especialidade, 'Total') AS especialidade,
-    COALESCE(m.nome, 'Total') AS nome_medico,
-    COALESCE(hp.nome, 'Total') AS clinica,
-    AVG(hp.valor) AS media_valor,
-    STDDEV_POP(hp.valor) AS desvio_padrao_valor
-FROM historial_paciente hp
-JOIN medico m ON hp.nif = m.nif
-WHERE hp.tipo = 'observacao' AND hp.valor IS NOT NULL
-GROUP BY ROLLUP(m.nome, hp.especialidade, hp.nome);
-
-
---uma versao diferente nenhuma delas esta bem uma juncao das duas estará bem
-SELECT
-    COALESCE(especialidade, 'Todas as Especialidades') AS especialidade,
-    COALESCE(nome_médico, 'Todos os Médicos') AS nome_médico,
-    COALESCE(nome_clinica, 'Todas as Clínicas') AS nome_clinica,
-    o.parametro AS parametro,
-    AVG(o.valor) AS valor_médio,
-    STDDEV(o.valor) AS desvio_padrão
+    m.especialidade AS especialidade,
+    m.nome AS nome_medico,
+    c.nome AS nome_clinica,
+    AVG(o.valor) AS media_valor,
+    STDDEV(o.valor) AS desvio_padrao_valor
 FROM 
     observacao o
 JOIN 
@@ -82,10 +79,11 @@ JOIN
     clinica cl ON c.nome = cl.nome
 WHERE 
     o.valor IS NOT NULL
-GROUP BY 
-    CUBE(especialidade, nome_médico, nome_clinica),
-    o.parametro
-ORDER BY 
-    especialidade, nome_médico, nome_clinica, parametro;
-
+GROUP BY GROUPING SETS(
+    (),
+    (m.especialidade),
+    (m.especialidade, nome_medico),
+    (nome_clinica),
+    (m.especialidade, nome_medico, nome_clinica))
+ORDER BY especialidade, nome_medico, nome_clinica;
 
