@@ -85,6 +85,7 @@ The system leverages **PostgreSQL** as the database backend, using a series of S
 - **Running Queries**: The `analise_de_dados.sql` script contains various queries for analyzing patient data, prescriptions, and consultations.
 - **Creating Indexes**: The `indices.sql` script defines the indexes for optimizing query performance.
 
+
 ## Conclusion
 
 This project provides a comprehensive solution for managing health-related data through a web API, demonstrating the application of database management, web development, and integration of SQL for data analysis and performance optimization.
