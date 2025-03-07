@@ -1,93 +1,92 @@
-# Bases de Dados
+# Health Management System (Projeto de Bases de Dados 2023/2024)
 
+## Project Overview
 
+The **Health Management System** is a web-based application designed to manage clinics, doctors, patients, and consultations. It facilitates the process of managing health-related appointments, handling medical records, and integrating various databases for a healthcare environment. This project was developed as part of the **Projeto de Bases de Dados** for the 2023/2024 academic year.
 
-## Getting started
+The application uses a **PostgreSQL** database to store data and provides a **RESTful API** for interacting with the database. The application includes functionality for registering, canceling, and listing consultations, managing clinics, specialties, and doctors, as well as integrating patient data and prescriptions.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Team Members
+- **Tiago Branquinho** (GitHub: [tsbranquinho](https://github.com/tsbranquinho))
+- **Rafael Avelar** (GitHub: [RafaelAvelar14](https://github.com/RafaelAvelar14))
+- **Lara Faria** (Github: [lara-gfaria](https://github.com/lara-gfaria))
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Key Features
 
-## Add your files
+- **Clinics Management**: Listing clinics with their name, address, and phone number.
+- **Doctor and Specialties Management**: Ability to list specialties available at clinics, along with available doctors and their consultation times.
+- **Consultation Management**: Register, cancel, and view consultations, ensuring all rules for scheduling and canceling are enforced.
+- **Patient Management**: Support for registering patient data, managing consultations, and recording medical prescriptions and observations.
+- **Web API**: Provides a REST API that allows interaction with the system for consultation management, registration, and data retrieval.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Repository Contents
 
-```
-cd existing_repo
-git remote add origin https://gitlab.rnl.tecnico.ulisboa.pt/ist1106635/bases-de-dados.git
-git branch -M master
-git push -uf origin master
-```
+- **`app.py`**: Main Flask application to serve the REST API for managing consultations, clinics, doctors, and patients.
+- **`write_sql_database.py`**: Script to populate the database with synthetic data for testing and demonstration purposes, including random generation of medical records.
+- **SQL Scripts**:
+  - **`analise_de_dados.sql`**: Contains SQL queries for data analysis.
+  - **`indices.sql`**: Defines SQL queries for creating necessary indices to improve performance.
+  - **`populate.sql`**: Contains SQL commands for populating the database with essential data.
+  - **`restricoes.sql`**: SQL commands for adding integrity constraints in the database.
+  - **`saude.sql`**: The SQL schema for creating the healthcare database and tables.
+  - **`test.sql`**: Sample queries for testing and validating the data and queries.
+  - **`vistas.sql`**: SQL views for combining important data from multiple tables.
+- **`README.md`**: This file, providing an overview of the project.
 
-## Integrate with your tools
+## How It Works
 
-- [ ] [Set up project integrations](https://gitlab.rnl.tecnico.ulisboa.pt/ist1106635/bases-de-dados/-/settings/integrations)
+The system leverages **PostgreSQL** as the database backend, using a series of SQL scripts to create the database schema, populate tables with sample data, and perform analytical tasks. The **Flask application** (`app.py`) is responsible for serving the REST API, allowing external applications or services to interact with the system.
 
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Key Components:
+1. **Web Service**: Exposes several endpoints to manage clinics, doctors, specialties, consultations, and patients.
+2. **Database**: The database stores all relevant health data, including clinic details, medical records, consultation times, and patient information.
+3. **Data Population Script**: The `write_sql_database.py` script generates mock data for the database using random generation techniques.
+4. **SQL Scripts**: Multiple SQL files are provided for creating the database schema, populating tables, creating indices, and executing specific queries.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Running the Flask Application
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+1. **Install Dependencies**:
+   To install the necessary dependencies, use:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+2. **Start the Flask App**:
+   To run the Flask application, execute the following:
+   ```bash
+   python app.py
+   ```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+   The app will be available at `http://localhost:5000` by default.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+3. **Using the API**:
+   The following are the key endpoints available in the API:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+   - **`GET /`**: List all clinics with their name and address.
+   - **`GET /c/<clinica>/`**: List all specialties offered at a specific clinic.
+   - **`GET /c/<clinica>/<especialidade>/`**: List all doctors in a specific specialty at a clinic and their next available consultation times.
+   - **`POST /a/<clinica>/registar/`**: Register a new consultation at a clinic.
+   - **`DELETE /a/<clinica>/cancelar/`**: Cancel a consultation.
 
-## License
-For open source projects, say how it is licensed.
+4. **Populating the Database**:
+   To populate the database with synthetic data, run the following script:
+   ```bash
+   python write_sql_database.py
+   ```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+   This will generate a `data.sql` file that contains all necessary SQL commands to populate the database.
+
+### SQL Scripts
+
+- **Creating the Database**: The `saude.sql` script defines the schema for the database, including all necessary tables.
+- **Inserting Data**: The `populate.sql` script can be used to populate the database with a set of test data.
+- **Running Queries**: The `analise_de_dados.sql` script contains various queries for analyzing patient data, prescriptions, and consultations.
+- **Creating Indexes**: The `indices.sql` script defines the indexes for optimizing query performance.
+
+## Conclusion
+
+This project provides a comprehensive solution for managing health-related data through a web API, demonstrating the application of database management, web development, and integration of SQL for data analysis and performance optimization.
+
+---
